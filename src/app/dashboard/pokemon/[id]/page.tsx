@@ -7,7 +7,7 @@ interface Props {
     params: { id: string }
 }
 
-export async function geneateMetadata({ params }: Props): Promise<Metadata> {
+async function geneateMetadata({ params }: Props): Promise<Metadata> {
     try {
         const { id, name } = await getPokemon(params.id)
         return {
