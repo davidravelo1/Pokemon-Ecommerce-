@@ -1,66 +1,40 @@
-# adapted from https://github.com/vercel/next.js/tree/canary/examples/with-docker
-# needs next.config.js to set build to stand-alone with context as follows
-# /** @type {import('next').NextConfig} */
-# module.exports = {
-#  output: 'standalone',
-# }
+# Install the application dependencies in a full UBI Node docker image
+FROM registry.access.redhat.com/ubi8/nodejs-18:latest AS base
 
-# Recommended to have .dockerignore file with the following content
-# Dockerfile
-# .dockerignore
-# node_modules
-# npm-debug.log
-# README.md
-# .next
-# .git
+# Elevate privileges to run npm
+USER root
 
-# Install dependencies only when needed
-FROM registry.access.redhat.com/ubi8/nodejs-18 AS deps
-USER 0
-WORKDIR /app
+# Copy package.json and package-lock.json
+COPY package*.json ./
 
-# Install dependencies based on the preferred package manager
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
-RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm i; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
+# Install app dependencies
+RUN npm ci
 
-# Rebuild the source code only when needed
-FROM registry.access.redhat.com/ubi8/nodejs-18 AS builder
-USER 0
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+# Copy the dependencies into a minimal Node.js image
+FROM registry.access.redhat.com/ubi8/nodejs-18-minimal:latest AS final
 
-# Next.js collects completely anonymous telemetry data about general usage.
-# Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry during the build.
-ENV NEXT_TELEMETRY_DISABLED 1
+# copy the app dependencies
+COPY --from=base /opt/app-root/src/node_modules /opt/app-root/src/node_modules
+COPY . /opt/app-root/src
 
-# If using yarn uncomment out and comment out npm below
-# RUN yarn build
-RUN npm install -g npm@10.5.0
-# If using npm comment out above and use below instead
+# Build the pacckages in minimal image
 RUN npm run build
 
-# Production image, copy all the files and run next
-FROM registry.access.redhat.com/ubi8/nodejs-18-minimal AS runner
-USER 0
-WORKDIR /app
+# Elevate privileges to change owner of source files
+USER root
+RUN chown -R 1001:0 /opt/app-root/src
 
-ENV NODE_ENV production
-# Uncomment the following line in case you want to enable telemetry during runtime.
-ENV NEXT_TELEMETRY_DISABLED 1
-
-COPY --from=builder /app/public ./public
-
+# Restore default user privileges
 USER 1001
 
-EXPOSE 3000
+# Run application in 'development' mode
+ENV NODE_ENV development
 
+# Listen on port 3000
 ENV PORT 3000
 
-CMD ["node", "server.js"]
+# Container exposes port 3000
+EXPOSE 3000
+
+# Start node process
+CMD ["npm", "start"]
