@@ -42,7 +42,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 
 # If using yarn uncomment out and comment out npm below
 # RUN yarn build
-
+RUN npm install -g npm@10.5.0
 # If using npm comment out above and use below instead
 RUN npm run build
 
