@@ -1,9 +1,11 @@
 import React from 'react'
-
+import WidgetsGrid from '@/components/dashboard/WidgetsGrid'
 function MainPage() {
   return (
-    <div>
-      <h1>Pagina principal</h1>
+    <div className='text-black'>
+      <h1>Dashboard</h1>
+      <span className='text-xl'>Información general</span>
+      <WidgetsGrid/>
     </div>
   )
 }

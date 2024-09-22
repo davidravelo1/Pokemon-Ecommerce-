@@ -1,6 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
-import { IoBrowsersOutline, IoCalculator, IoFootball, IoLogoReact } from 'react-icons/io5'
+import { IoBrowsersOutline, IoCalculator, IoFootball, IoLogoReact, IoHeartOutline } from 'react-icons/io5';
 import { MdCatchingPokemon } from "react-icons/md";
 import {SidebarMenuItem} from './SidebarMenuItem'
 
@@ -23,6 +23,12 @@ const menuItems = [
         icon: <MdCatchingPokemon  size={40}/>,
         title: 'Pokemons',
         subTitle: 'All pokemons'
+    },
+    {
+        path: '/dashboard/favorites',
+        icon: <IoHeartOutline  size={40}/>,
+        title: 'Favoritos',
+        subTitle: 'Global state'
     }
 ]
 function Sidebar() {
@@ -42,13 +48,13 @@ function Sidebar() {
                 <a href="#" className="inline-flex space-x-2 items-center">
                     <span>
                         <Image className="rounded-full w-8 h-8" 
-                        src="https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=128&q=80"
+                        src="/imagen.jpeg"
                         alt="User Avatar" 
                         width={50}
                         height={50}/>
                     </span>
                     <span className="text-sm md:text-base font-bold">
-                        Edward Tompson
+                        David Ravelo
                     </span>
                 </a>
             </div>

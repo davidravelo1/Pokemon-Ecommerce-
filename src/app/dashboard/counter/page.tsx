@@ -7,6 +7,7 @@ export const metadata = {
  title: 'Counter Page',
  description: 'Page with the counter ',
 };
+
 function page() {
 
   return (
